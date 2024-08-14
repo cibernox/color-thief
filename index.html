@@ -20,9 +20,9 @@
 
     <script id='image-tpl' type='text/x-mustache'>
         {{#.}}
-            <div class="image-section" data-image="{{.}}">
-                <h2>{{.}}</h2>
-                <img class="image" src="./examples/img/{{.}}" />
+            <div class="image-section" data-image="{{image}}">
+                <h2>{{image}} {{type}}</h2>
+                <img class="image" src="./examples/img/{{image}}" />
                 <div class="output"></div>
             </div>
         {{/.}}
@@ -56,9 +56,10 @@
         </div>
     </script>
 
-  <script src="dist/color-thief.umd.js"></script>
+  <!-- <script src="dist/color-thief.umd.js"></script> -->
+  <!-- <script src="src/color-thief.js" type="module"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
-  <script src="examples/js/demo.js"></script>
+  <script src="examples/js/demo.js" type="module"></script>
 
 </body>
 </html>

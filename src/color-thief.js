@@ -55,8 +55,8 @@ var ColorThief = function () {};
  * most dominant color.
  *
  * */
-ColorThief.prototype.getColor = function(sourceImage, quality = 10) {
-    const palette       = this.getPalette(sourceImage, 5, quality);
+ColorThief.prototype.getColor = function(sourceImage, { quality = 10, areaToExclude = undefined } = {}) {
+    const palette       = this.getPalette(sourceImage, 5, { quality, areaToExclude });
     const dominantColor = palette[0];
     return dominantColor;
 };
@@ -77,18 +77,19 @@ ColorThief.prototype.getColor = function(sourceImage, quality = 10) {
  *
  *
  */
-ColorThief.prototype.getPalette = function(sourceImage, colorCount, quality) {
+ColorThief.prototype.getPalette = function(sourceImage, colorCount, { quality, areaToExclude } = {}) {
     const options = core.validateOptions({
         colorCount,
-        quality
+        quality,
+        areaToExclude
     });
 
     // Create custom CanvasImage object
     const image      = new CanvasImage(sourceImage);
     const imageData  = image.getImageData();
-    const pixelCount = image.width * image.height;
+    const { width, height } = image;
 
-    const pixelArray = core.createPixelArray(imageData.data, pixelCount, options.quality);
+    const pixelArray = core.createPixelArray(imageData.data, width, height, options.quality, options.areaToExclude);
 
     // Send array to quantize function which clusters values
     // using median cut algorithm

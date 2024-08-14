@@ -1,26 +1,43 @@
-function createPixelArray(imgData, pixelCount, quality) {
+function createPixelArray(imgData, width, height, quality, areaToExclude) {
+    const pixelCount = width * height;
     const pixels = imgData;
     const pixelArray = [];
+    let xMin = 0;
+    let xMax = 0;
+    let yMin = 0;
+    let yMax = 0;
+
+    if (areaToExclude) {
+        const [topLeft, bottomRight] = areaToExclude;
+        [xMin, yMin] = topLeft;
+        [xMax, yMax] = bottomRight;
+    }
 
     for (let i = 0, offset, r, g, b, a; i < pixelCount; i = i + quality) {
-        offset = i * 4;
-        r = pixels[offset + 0];
-        g = pixels[offset + 1];
-        b = pixels[offset + 2];
-        a = pixels[offset + 3];
+        const x = i % width;
+        const y = Math.floor(i / width);
 
-        // If pixel is mostly opaque and not white
-        if (typeof a === 'undefined' || a >= 125) {
-            if (!(r > 250 && g > 250 && b > 250)) {
-                pixelArray.push([r, g, b]);
+        if (!(x >= xMin && x <= xMax && y >= yMin && y <= yMax)) {
+            offset = i * 4;
+            r = pixels[offset + 0];
+            g = pixels[offset + 1];
+            b = pixels[offset + 2];
+            a = pixels[offset + 3];
+
+            // If pixel is mostly opaque and not white
+            if (typeof a === 'undefined' || a >= 125) {
+                if (!(r > 250 && g > 250 && b > 250)) {
+                    pixelArray.push([r, g, b]);
+                }
             }
         }
     }
+    console.log('pixelArray.length',pixelArray.length);
     return pixelArray;
 }
 
 function validateOptions(options) {
-    let { colorCount, quality } = options;
+    let { colorCount, quality, areaToExclude } = options;
 
     if (typeof colorCount === 'undefined' || !Number.isInteger(colorCount)) {
         colorCount = 10;
@@ -35,9 +52,19 @@ function validateOptions(options) {
         quality = 10;
     }
 
+    if (areaToExclude) {
+        if (!Array.isArray(areaToExclude) || areaToExclude.length !== 2) {
+            throw new Error('areaToExclude should be an array of 2 coordinates');
+        }
+        if (areaToExclude.some(coords => !Array.isArray(coords) || coords.length !== 2)) {
+            throw new Error('areaToExclude must contain an array top-left and bottom-right coordinates');
+        }
+    }
+
     return {
         colorCount,
-        quality
+        quality,
+        areaToExclude
     }
 }
 
